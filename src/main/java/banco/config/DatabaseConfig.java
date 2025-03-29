@@ -1,3 +1,22 @@
+/**
+ * Sistema Bancario Básico - TP1 Ejercicio 4
+ * <p>
+ * Trabajo Práctico N°1 de la materia Laboratorio de Programación (2025) 
+ * de la Licenciatura en Sistemas de la Universidad Nacional de la Patagonia Austral (UNPA-UARG).
+ * </p>
+ * 
+ * Configuración de conexión a base de datos para el TP1-E4.
+ * <p>
+ * Desarrollo requerido para el Laboratorio de Programación (UNPA-UARG 2025).
+ * Implementa el patrón Singleton para gestionar conexiones JDBC.
+ * </p>
+ *  * 
+ * @author Nicolas Butterfield
+ * @version 1.0
+ * @since Marzo 2025
+ */
+
+
 package banco.config;
 
 import java.sql.Connection;

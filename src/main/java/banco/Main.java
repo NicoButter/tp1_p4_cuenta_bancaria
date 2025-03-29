@@ -1,3 +1,21 @@
+/**
+ * Sistema Bancario Básico - TP1 Ejercicio 4
+ * <p>
+ * Trabajo Práctico N°1 de la materia Laboratorio de Programación (2025) 
+ * de la Licenciatura en Sistemas de la Universidad Nacional de la Patagonia Austral (UNPA-UARG).
+ * </p>
+ * <p>
+ * Implementa un menú interactivo para operaciones bancarias (depósitos, extracciones, consultas) 
+ * con persistencia en base de datos MariaDB.
+ * </p>
+ * con persistencia en base de datos, motor: MariaDB en openSUSE :) en mi Victus 16
+ * 
+ * 
+ * @author Nicolas Butterfield
+ * @version 1.0
+ * @since Marzo 2025
+ */
+
 package banco;
 
 import banco.service.BancoService;

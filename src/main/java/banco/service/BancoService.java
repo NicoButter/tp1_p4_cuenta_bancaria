@@ -1,3 +1,22 @@
+/**
+ * Sistema Bancario Básico - TP1 Ejercicio 4
+ * <p>
+ * Trabajo Práctico N°1 de la materia Laboratorio de Programación (2025) 
+ * de la Licenciatura en Sistemas de la Universidad Nacional de la Patagonia Austral (UNPA-UARG).
+ * </p>
+ * 
+ * <p>
+ * Implementa:
+ *  - Gestión transaccional (depósitos/extracciones)
+ *  - Validación de reglas de negocio
+ *  - Integración con DAOs
+ * </p>
+ *   * 
+ * @author Nicolas Butterfield
+ * @version 1.0
+ * @since Marzo 2025
+ */
+
 package banco.service;
 
 import java.sql.Connection;
