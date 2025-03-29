@@ -1,9 +1,10 @@
-package service;
+package banco.service;
 
-import dao.CuentasDAO;
-import dao.MovimientosDAO;
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import banco.dao.CuentasDAO;
+import banco.dao.MovimientosDAO;
 
 public class BancoService {
     private final CuentasDAO cuentasDAO;

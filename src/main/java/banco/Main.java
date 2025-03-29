@@ -1,4 +1,7 @@
-import service.BancoService;
+package banco;
+
+import banco.service.BancoService;
+import banco.config.DatabaseConfig;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Scanner;
