@@ -11,7 +11,7 @@
  *  - Validación de reglas de negocio
  *  - Integración con DAOs
  * </p>
- *   * 
+ * 
  * @author Nicolas Butterfield
  * @version 1.0
  * @since Marzo 2025

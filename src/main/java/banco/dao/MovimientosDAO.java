@@ -1,3 +1,26 @@
+/**
+ * Sistema Bancario Básico - TP1 Ejercicio 4
+ * <p>
+ * Trabajo Práctico N°1 de la materia Laboratorio de Programación (2025) 
+ * de la Licenciatura en Sistemas de la Universidad Nacional de la Patagonia Austral (UNPA-UARG).
+ * </p>
+ * 
+ * Data Access Object (DAO) para la tabla MOVIMIENTOS del sistema bancario.
+ <p>
+ * Patrones aplicados:
+ * <ul>
+ *   <li>Data Access Object</li>
+ *   <li>Inyección de dependencias</li>
+ * </ul>
+ * </p>
+ * 
+ * 
+ * @author Nicolas Butterfield
+ * @version 1.0
+ * @since Marzo 2025
+ * 
+ */
+
 package banco.dao;
 
 import java.sql.Connection;
