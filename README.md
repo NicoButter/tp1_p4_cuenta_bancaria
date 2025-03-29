@@ -1,10 +1,8 @@
-# TP1 - Ejercicio 4: Sistema Bancario
+# TP1 - Ejercicio 4: Sistema Bancario - Laboratorio de Programación 2025 (UNPA)
 
 ## 📋 Información Académica
 
-| **Universidad**                                          | **Carrera**              | **Materia**                 | **Año** |
-| -------------------------------------------------------- | ------------------------ | --------------------------- | ------- |
-| Universidad Nacional de la Patagonia Austral (UNPA-UARG) | Licenciatura en Sistemas | Laboratorio de Programación | 2025    |
+Este proyecto corresponde al **Ejercicio 1.4 del Trabajo Práctico 1** de la asignatura *Laboratorio de Programación 2025* de la Universidad Nacional de la Patagonia Austral (UNPA).  
 
 ## 📖 Descripción
 
@@ -35,7 +33,8 @@ El propósito de este trabajo práctico es aplicar y demostrar conocimientos sob
 - **Frameworks:** JDBC
 - **Arquitectura:** DAO - Service - Main
 - **Herramientas:** Javadoc para documentación
-
+- **VSC en mi openSUSE - Victus D16
+  
 ## 🚀 Instalación y Ejecución
 
 1. Clonar el repositorio:
@@ -46,11 +45,15 @@ El propósito de este trabajo práctico es aplicar y demostrar conocimientos sob
 3. Asegurar que las dependencias de JDBC estén configuradas.
 4. Compilar y ejecutar el programa desde la clase principal.
 
-## 📜 Licencia
+## 📜 Licencia MIT
 
-Este proyecto es de uso académico y no posee una licencia específica.
+## 📢 Notas adicionales
 
----
+- Este proyecto forma parte del **TP1 de Laboratorio de Programación 2025** (UNPA).  
+- Compatible con **MySQL** y **MariaDB** (ajusta el driver si usas otra base de datos).  
+- Asegúrate de tener el puerto **3306** abierto si usas una BD remota.  
 
 📌 **Autor:** Nicolás Butterfield  
 📧 **Contacto:** nicobutter@gmail.com (mailto:nicobutter@gmail.com)
+
+🚀 ¡Gracias por revisar este proyecto! Si tienes dudas, pregúntame. 
