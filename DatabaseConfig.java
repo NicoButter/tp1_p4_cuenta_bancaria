@@ -11,14 +11,22 @@ public class DatabaseConfig {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             
-            return DriverManager.getConnection(URL, USER, PASSWORD);
+            return DriverManager.getConnection(
+                URL, 
+                USER, 
+                PASSWORD
+            );
         } catch (ClassNotFoundException e) {
-            System.out.println("No encuentro el driver :| revisá la configuración de tu proyecto.");
+            System.err.println("Error: No encontré el driver JDBC de MariaDB :|");
+            System.err.println("¿Incluiste el conector JDBC de MariaDB en tus dependencias? revisalo...");
             e.printStackTrace();
         } catch (SQLException e) {
-            System.out.println("Error al intentar conectarse a la base de datos");
+            System.err.println("Error de conexión a la base de datos:");
+            System.err.println("URL: " + URL);
+            System.err.println("Usuario: " + USER);
             e.printStackTrace();
         }
         return null;
     }
 }
+
