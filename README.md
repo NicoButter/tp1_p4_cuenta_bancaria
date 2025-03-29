@@ -52,5 +52,5 @@ Este proyecto es de uso académico y no posee una licencia específica.
 
 ---
 
-📌 **Autor:** [Tu Nombre]  
-📧 **Contacto:** [tuemail@ejemplo.com](mailto:tuemail@ejemplo.com)
+📌 **Autor:** Nicolás Butterfield  
+📧 **Contacto:** nicobutter@gmail.com (mailto:nicobutter@gmail.com)
