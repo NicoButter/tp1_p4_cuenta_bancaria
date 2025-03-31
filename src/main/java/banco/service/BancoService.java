@@ -25,6 +25,7 @@ import java.util.List;
 
 import banco.dao.CuentasDAO;
 import banco.dao.MovimientosDAO;
+import banco.model.Cuenta;
 import banco.model.Movimiento;
 
 public class BancoService {
@@ -50,31 +51,23 @@ public class BancoService {
 
         return cuentasDAO.crearCuenta(cliente, saldoInicial, tipoCuenta);
     }
-
-    // public boolean eliminarCuenta(int numeroCuenta) throws SQLException {
-    //     return cuentasDAO.eliminarCuenta(numeroCuenta);
-    // }
     
     public boolean eliminarCuenta(int numeroCuenta) throws SQLException {
         try {
             connection.setAutoCommit(false);
             
-            // 1. Verificar si la cuenta existe y obtener su id_cuenta
             int idCuenta = cuentasDAO.obtenerIdCuenta(numeroCuenta);
             if (idCuenta == -1) {
                 throw new SQLException("La cuenta " + numeroCuenta + " no existe");
             }
             
-            // 2. Verificar saldo cero
             double saldo = cuentasDAO.obtenerSaldo(numeroCuenta);
             if (saldo != 0) {
                 throw new SQLException("No se puede eliminar: la cuenta tiene saldo $" + saldo);
             }
             
-            // 3. Eliminar movimientos asociados primero
             movimientosDAO.eliminarMovimientosPorCuenta(idCuenta);
             
-            // 4. Eliminar la cuenta
             boolean eliminada = cuentasDAO.eliminarCuenta(idCuenta);
             
             if (eliminada) {
@@ -91,9 +84,9 @@ public class BancoService {
             connection.setAutoCommit(true);
         }
     }
-    
+
     public boolean depositar(int numeroCuenta, double monto) throws SQLException {
-        validarMontoPositivo(monto); // Valida monto > 0
+        validarMontoPositivo(monto); 
 
         try {
             connection.setAutoCommit(false);
@@ -109,11 +102,26 @@ public class BancoService {
             return true;
         } catch (SQLException e) {
             connection.rollback();
-            throw new SQLException("Error en depósito: " + e.getMessage(), e); // Mejor mensaje
+            throw new SQLException("Error en depósito: " + e.getMessage(), e);
         } finally {
             connection.setAutoCommit(true);
         }
     }
+
+    public void listarTodasLasCuentas() throws SQLException {
+    List<Cuenta> cuentas = cuentasDAO.listarTodasLasCuentas();
+    
+    System.out.println("\n=== LISTADO DE CUENTAS ===");
+    System.out.println("Número   | Cliente               | Tipo    | Saldo");
+    System.out.println("--------------------------------------------------");
+    
+    if (cuentas.isEmpty()) {
+        System.out.println("No hay cuentas registradas");
+    } else {
+        cuentas.forEach(System.out::println);
+    }
+    System.out.println("Total: " + cuentas.size() + " cuentas");
+}
 
     public boolean extraer(int numeroCuenta, double monto) throws SQLException {
         validarMontoPositivo(monto);

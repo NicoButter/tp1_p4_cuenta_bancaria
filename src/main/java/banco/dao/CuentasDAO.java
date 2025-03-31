@@ -23,11 +23,14 @@
 
 package banco.dao;
 
+import banco.model.Cuenta;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import banco.config.DatabaseConfig;
 
@@ -51,6 +54,25 @@ public class CuentasDAO {
         }
     }
 
+    public List<Cuenta> listarTodasLasCuentas() throws SQLException {
+        String sql = "SELECT id_cuenta, cuenta, cliente, saldo, tipo_cuenta FROM cuentas";
+        List<Cuenta> cuentas = new ArrayList<>();
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                cuentas.add(new Cuenta(
+                        rs.getInt("id_cuenta"),
+                        rs.getInt("cuenta"),
+                        rs.getString("cliente"),
+                        rs.getDouble("saldo"),
+                        rs.getString("tipo_cuenta").charAt(0)));
+            }
+        }
+        return cuentas;
+    }
+
     public char obtenerTipoCuenta(int numeroCuenta) throws SQLException {
         String sql = "SELECT tipo_cuenta FROM cuentas WHERE cuenta = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -66,16 +88,16 @@ public class CuentasDAO {
     public int crearCuenta(String cliente, double saldoInicial, char tipoCuenta) throws SQLException {
         String sqlInsert = "INSERT INTO cuentas (cliente, saldo, tipo_cuenta) VALUES (?, ?, ?)";
         String sqlUpdate = "UPDATE cuentas SET cuenta = ? WHERE id_cuenta = ?";
-        
+
         try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement stmtInsert = conn.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS);
-             PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
-    
+                PreparedStatement stmtInsert = conn.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
+
             stmtInsert.setString(1, cliente);
             stmtInsert.setDouble(2, saldoInicial);
             stmtInsert.setString(3, String.valueOf(tipoCuenta));
             stmtInsert.executeUpdate();
-    
+
             int idGenerado;
             try (ResultSet rs = stmtInsert.getGeneratedKeys()) {
                 if (!rs.next()) {
@@ -83,12 +105,12 @@ public class CuentasDAO {
                 }
                 idGenerado = rs.getInt(1);
             }
-    
+
             int numeroCuentaVisible = 1000 + idGenerado;
             stmtUpdate.setInt(1, numeroCuentaVisible);
             stmtUpdate.setInt(2, idGenerado);
             stmtUpdate.executeUpdate();
-    
+
             return numeroCuentaVisible;
         }
     }

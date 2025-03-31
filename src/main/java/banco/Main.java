@@ -13,6 +13,7 @@
  * @version 1.1
  * @since Marzo 2025
  */
+
 package banco;
 
 import banco.service.BancoService;
@@ -63,10 +64,11 @@ public class Main {
 
                     switch (opcion) {
                         case 1 -> crearCuenta(bancoService);
-                        case 2 -> realizarOperacion(bancoService, "DEPÓSITO");
-                        case 3 -> realizarOperacion(bancoService, "EXTRACCIÓN");
-                        case 4 -> consultarSaldo(bancoService);
-                        case 5 -> eliminarCuenta(bancoService);
+                        case 2 -> listarCuentas(bancoService);
+                        case 3 -> realizarOperacion(bancoService, "DEPÓSITO");
+                        case 4 -> realizarOperacion(bancoService, "EXTRACCIÓN");
+                        case 5 -> consultarSaldo(bancoService);
+                        case 6 -> eliminarCuenta(bancoService);
                         case 7 -> mostrarMovimientosCuenta(bancoService);
                         case 8 -> filtrarMovimientosPorTipo(bancoService);
                         case 9 -> mostrarMovimientosCliente(bancoService);
@@ -91,10 +93,11 @@ public class Main {
     private static void mostrarMenu() {
         System.out.println("\n=== SISTEMA BANCARIO - TP1 - P4 ===");
         System.out.println("1. Crear cuenta nueva");
-        System.out.println("2. Depositar");
-        System.out.println("3. Extraer");
-        System.out.println("4. Consultar saldo");
-        System.out.println("5. Eliminar cuenta");
+        System.out.println("2. Listar todas las cuentas");
+        System.out.println("3. Depositar");
+        System.out.println("4. Extraer");
+        System.out.println("5. Consultar saldo");
+        System.out.println("6. Eliminar cuenta");
         System.out.println("7. Mostrar movimientos de cuenta");
         System.out.println("8. Mostrar depósitos/extracciones");
         System.out.println("9. Mostrar movimientos por cliente");;
@@ -121,6 +124,17 @@ public class Main {
             pausar();
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
+        }
+    }
+
+    private static void listarCuentas(BancoService bancoService) {
+        System.out.println("\n--- LISTADO DE CUENTAS ---");
+        try {
+            bancoService.listarTodasLasCuentas();
+            pausar();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            pausar();
         }
     }
 
@@ -183,8 +197,8 @@ public class Main {
                 System.out.println("Cuenta eliminada exitosamente");
             } else {
                 System.out.println("No se pudo eliminar la cuenta");
-            }
-            pausar(); // Mover la pausa fuera del if-else
+            } 
+            pausar();
         } catch (InputMismatchException e) {
             System.err.println("Error: Ingrese un número válido");
             scanner.nextLine();
@@ -227,7 +241,6 @@ public class Main {
             pausar();
         }
     }
-
 
     private static void mostrarMovimientosCliente(BancoService bancoService) {
         System.out.println("\n--- MOVIMIENTOS POR CLIENTE ---");
