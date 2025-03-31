@@ -75,10 +75,10 @@ public class MovimientosDAO {
             while (rs.next()) {
                 movimientos.add(new Movimiento(
                     rs.getInt("id_movimiento"),
-                    rs.getInt("num_cuenta"), // Usamos el número de cuenta visible
+                    rs.getInt("num_cuenta"), 
                     rs.getString("mov").charAt(0),
                     rs.getDouble("importe"),
-                    null // No hay campo fecha en tu tabla
+                    null 
                 ));
             }
         }
@@ -100,7 +100,7 @@ public class MovimientosDAO {
                 movimientos.add(new Movimiento(
                     rs.getInt("id_movimiento"),
                     rs.getInt("cuenta"),
-                    rs.getString("tipo").charAt(0), // Corrección aquí
+                    rs.getString("tipo").charAt(0), 
                     rs.getDouble("monto"),
                     rs.getTimestamp("fecha")
                 ));
@@ -123,7 +123,7 @@ public class MovimientosDAO {
                 movimientos.add(new Movimiento(
                     rs.getInt("id_movimiento"),
                     rs.getInt("cuenta"),
-                    rs.getString("tipo").charAt(0), // Corrección aquí
+                    rs.getString("tipo").charAt(0), 
                     rs.getDouble("monto"),
                     rs.getTimestamp("fecha")
                 ));
