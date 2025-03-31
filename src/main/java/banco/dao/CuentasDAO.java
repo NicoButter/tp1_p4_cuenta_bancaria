@@ -172,4 +172,13 @@ public class CuentasDAO {
             }
         }
     }
+
+    public int obtenerIdCuenta(int numeroCuenta) throws SQLException {
+        String sql = "SELECT id_cuenta FROM cuentas WHERE cuenta = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, numeroCuenta);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() ? rs.getInt("id_cuenta") : -1;
+        }
+    }
 }

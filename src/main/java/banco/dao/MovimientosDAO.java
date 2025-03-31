@@ -132,4 +132,11 @@ public class MovimientosDAO {
         return movimientos;
     }
 
+    public void eliminarMovimientosPorCuenta(int idCuenta) throws SQLException {
+        String sql = "DELETE FROM movimientos WHERE id_cuenta = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, idCuenta);
+            stmt.executeUpdate();
+        }
+    }
 }

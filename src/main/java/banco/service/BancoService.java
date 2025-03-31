@@ -51,10 +51,47 @@ public class BancoService {
         return cuentasDAO.crearCuenta(cliente, saldoInicial, tipoCuenta);
     }
 
+    // public boolean eliminarCuenta(int numeroCuenta) throws SQLException {
+    //     return cuentasDAO.eliminarCuenta(numeroCuenta);
+    // }
+    
     public boolean eliminarCuenta(int numeroCuenta) throws SQLException {
-        return cuentasDAO.eliminarCuenta(numeroCuenta);
+        try {
+            connection.setAutoCommit(false);
+            
+            // 1. Verificar si la cuenta existe y obtener su id_cuenta
+            int idCuenta = cuentasDAO.obtenerIdCuenta(numeroCuenta);
+            if (idCuenta == -1) {
+                throw new SQLException("La cuenta " + numeroCuenta + " no existe");
+            }
+            
+            // 2. Verificar saldo cero
+            double saldo = cuentasDAO.obtenerSaldo(numeroCuenta);
+            if (saldo != 0) {
+                throw new SQLException("No se puede eliminar: la cuenta tiene saldo $" + saldo);
+            }
+            
+            // 3. Eliminar movimientos asociados primero
+            movimientosDAO.eliminarMovimientosPorCuenta(idCuenta);
+            
+            // 4. Eliminar la cuenta
+            boolean eliminada = cuentasDAO.eliminarCuenta(idCuenta);
+            
+            if (eliminada) {
+                connection.commit();
+                return true;
+            } else {
+                connection.rollback();
+                return false;
+            }
+        } catch (SQLException e) {
+            connection.rollback();
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
+        }
     }
-
+    
     public boolean depositar(int numeroCuenta, double monto) throws SQLException {
         validarMontoPositivo(monto); // Valida monto > 0
 
