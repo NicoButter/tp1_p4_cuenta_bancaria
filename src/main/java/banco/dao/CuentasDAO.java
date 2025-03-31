@@ -21,27 +21,70 @@
  * 
  */
 
-
 package banco.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+
+import banco.config.DatabaseConfig;
 
 public class CuentasDAO {
-    
-    /**
-     * Obtiene el saldo actual de una cuenta.
-     * @param numeroCuenta Número de cuenta (debe existir)
-     * @return Saldo actual como double
-     * @throws SQLException Si la cuenta no existe o hay error en la consulta
-     */
 
     private final Connection connection;
 
     public CuentasDAO(Connection connection) {
         this.connection = connection;
+    }
+
+    public int crearCuenta(String cliente, double saldoInicial, char tipoCuenta) throws SQLException {
+        String sql = "INSERT INTO cuentas (cliente, saldo, tipo_cuenta) VALUES (?, ?, ?)";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            stmt.setString(1, cliente);
+            stmt.setDouble(2, saldoInicial);
+            stmt.setString(3, String.valueOf(tipoCuenta));
+            stmt.executeUpdate();
+
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1); 
+                }
+            }
+        }
+        throw new SQLException("Error al crear cuenta, no se obtuvo ID");
+    }
+
+    public boolean eliminarCuenta(int numeroCuenta) throws SQLException {
+        String sqlVerificar = "SELECT saldo FROM cuentas WHERE cuenta = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sqlVerificar)) {
+
+            stmt.setInt(1, numeroCuenta);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                double saldo = rs.getDouble("saldo");
+                if (saldo != 0) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
+        String sqlEliminar = "DELETE FROM cuentas WHERE cuenta = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sqlEliminar)) {
+
+            stmt.setInt(1, numeroCuenta);
+            int affectedRows = stmt.executeUpdate();
+            return affectedRows > 0;
+        }
     }
 
     public boolean existeCuenta(int numeroCuenta) throws SQLException {
@@ -70,7 +113,7 @@ public class CuentasDAO {
     public void actualizarSaldo(int numeroCuenta, double monto, char tipoOperacion) throws SQLException {
         String operacion = (tipoOperacion == 'd') ? "saldo + ?" : "saldo - ?";
         String sql = "UPDATE cuentas SET saldo = " + operacion + " WHERE cuenta = ?";
-        
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setDouble(1, monto);
             stmt.setInt(2, numeroCuenta);

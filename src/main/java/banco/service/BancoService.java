@@ -36,19 +36,36 @@ public class BancoService {
         this.movimientosDAO = new MovimientosDAO(connection);
     }
 
+    public int crearCuenta(String cliente, double saldoInicial, char tipoCuenta)
+        throws SQLException, IllegalArgumentException {
+
+        if (saldoInicial < 0) {
+            throw new IllegalArgumentException("El saldo inicial no puede ser negativo");
+        }
+        if (tipoCuenta != 'A' && tipoCuenta != 'C') {
+            throw new IllegalArgumentException("Tipo de cuenta inválido. Use 'A' (Ahorro) o 'C' (Corriente)");
+        }
+
+        return cuentasDAO.crearCuenta(cliente, saldoInicial, tipoCuenta);
+    }
+
+    public boolean eliminarCuenta(int numeroCuenta) throws SQLException {
+        return cuentasDAO.eliminarCuenta(numeroCuenta);
+    }
+
     public void depositar(int numeroCuenta, double monto) throws SQLException {
         validarMontoPositivo(monto);
-        
+
         try {
             connection.setAutoCommit(false);
-            
+
             if (!cuentasDAO.existeCuenta(numeroCuenta)) {
                 throw new SQLException("La cuenta no existe");
             }
 
             cuentasDAO.actualizarSaldo(numeroCuenta, monto, 'd');
             movimientosDAO.registrarMovimiento(numeroCuenta, 'd', monto);
-            
+
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
@@ -60,10 +77,10 @@ public class BancoService {
 
     public void extraer(int numeroCuenta, double monto) throws SQLException {
         validarMontoPositivo(monto);
-        
+
         try {
             connection.setAutoCommit(false);
-            
+
             if (!cuentasDAO.existeCuenta(numeroCuenta)) {
                 throw new SQLException("La cuenta no existe");
             }
@@ -75,7 +92,7 @@ public class BancoService {
 
             cuentasDAO.actualizarSaldo(numeroCuenta, monto, 'e');
             movimientosDAO.registrarMovimiento(numeroCuenta, 'e', monto);
-            
+
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
