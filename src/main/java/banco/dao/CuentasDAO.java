@@ -39,24 +39,58 @@ public class CuentasDAO {
         this.connection = connection;
     }
 
-    public int crearCuenta(String cliente, double saldoInicial, char tipoCuenta) throws SQLException {
-        String sql = "INSERT INTO cuentas (cliente, saldo, tipo_cuenta) VALUES (?, ?, ?)";
-
-        try (Connection conn = DatabaseConfig.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            stmt.setString(1, cliente);
-            stmt.setDouble(2, saldoInicial);
-            stmt.setString(3, String.valueOf(tipoCuenta));
-            stmt.executeUpdate();
-
-            try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return rs.getInt(1); 
-                }
+    public String obtenerCliente(int numeroCuenta) throws SQLException {
+        String sql = "SELECT cliente FROM cuentas WHERE cuenta = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, numeroCuenta);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("cliente");
             }
+            throw new SQLException("Cuenta no encontrada");
         }
-        throw new SQLException("Error al crear cuenta, no se obtuvo ID");
+    }
+
+    public char obtenerTipoCuenta(int numeroCuenta) throws SQLException {
+        String sql = "SELECT tipo_cuenta FROM cuentas WHERE cuenta = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, numeroCuenta);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("tipo_cuenta").charAt(0);
+            }
+            throw new SQLException("Cuenta no encontrada");
+        }
+    }
+
+    public int crearCuenta(String cliente, double saldoInicial, char tipoCuenta) throws SQLException {
+        String sqlInsert = "INSERT INTO cuentas (cliente, saldo, tipo_cuenta) VALUES (?, ?, ?)";
+        String sqlUpdate = "UPDATE cuentas SET cuenta = ? WHERE id_cuenta = ?";
+        
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmtInsert = conn.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
+    
+            stmtInsert.setString(1, cliente);
+            stmtInsert.setDouble(2, saldoInicial);
+            stmtInsert.setString(3, String.valueOf(tipoCuenta));
+            stmtInsert.executeUpdate();
+    
+            int idGenerado;
+            try (ResultSet rs = stmtInsert.getGeneratedKeys()) {
+                if (!rs.next()) {
+                    throw new SQLException("Error al crear cuenta, no se obtuvo ID");
+                }
+                idGenerado = rs.getInt(1);
+            }
+    
+            int numeroCuentaVisible = 1000 + idGenerado;
+            stmtUpdate.setInt(1, numeroCuentaVisible);
+            stmtUpdate.setInt(2, idGenerado);
+            stmtUpdate.executeUpdate();
+    
+            return numeroCuentaVisible;
+        }
     }
 
     public boolean eliminarCuenta(int numeroCuenta) throws SQLException {

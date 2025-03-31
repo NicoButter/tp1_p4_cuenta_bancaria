@@ -23,9 +23,13 @@
 
 package banco.dao;
 
+import banco.model.Movimiento;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MovimientosDAO {
     private final Connection connection;
@@ -57,4 +61,75 @@ public class MovimientosDAO {
             stmt.executeUpdate();
         }
     }
+
+    public List<Movimiento> obtenerMovimientosCuenta(int numeroCuenta) throws SQLException {
+        String sql = "SELECT m.*, c.cuenta as num_cuenta FROM movimientos m " +
+                    "JOIN cuentas c ON m.id_cuenta = c.id_cuenta " +
+                    "WHERE c.cuenta = ? ORDER BY m.id_movimiento DESC";
+        List<Movimiento> movimientos = new ArrayList<>();
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, numeroCuenta);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                movimientos.add(new Movimiento(
+                    rs.getInt("id_movimiento"),
+                    rs.getInt("num_cuenta"), // Usamos el número de cuenta visible
+                    rs.getString("mov").charAt(0),
+                    rs.getDouble("importe"),
+                    null // No hay campo fecha en tu tabla
+                ));
+            }
+        }
+        return movimientos;
+    }
+
+    public List<Movimiento> obtenerMovimientosPorTipo(int numeroCuenta, char tipo) throws SQLException {
+        String sql = "SELECT m.*, c.cuenta as num_cuenta FROM movimientos m " +
+                    "JOIN cuentas c ON m.id_cuenta = c.id_cuenta " +
+                    "WHERE c.cuenta = ? AND m.mov = ? ORDER BY m.id_movimiento DESC";
+        List<Movimiento> movimientos = new ArrayList<>();
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, numeroCuenta);
+            stmt.setString(2, String.valueOf(tipo));
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                movimientos.add(new Movimiento(
+                    rs.getInt("id_movimiento"),
+                    rs.getInt("cuenta"),
+                    rs.getString("tipo").charAt(0), // Corrección aquí
+                    rs.getDouble("monto"),
+                    rs.getTimestamp("fecha")
+                ));
+            }
+        }
+        return movimientos;
+    }
+
+    public List<Movimiento> obtenerMovimientosCliente(String nombreCliente) throws SQLException {
+        String sql = "SELECT m.*, c.cuenta as num_cuenta FROM movimientos m " +
+                    "JOIN cuentas c ON m.id_cuenta = c.id_cuenta " +
+                    "WHERE c.cliente LIKE ? ORDER BY m.id_movimiento DESC";
+        List<Movimiento> movimientos = new ArrayList<>();
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, "%" + nombreCliente + "%");
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                movimientos.add(new Movimiento(
+                    rs.getInt("id_movimiento"),
+                    rs.getInt("cuenta"),
+                    rs.getString("tipo").charAt(0), // Corrección aquí
+                    rs.getDouble("monto"),
+                    rs.getTimestamp("fecha")
+                ));
+            }
+        }
+        return movimientos;
+    }
+
 }

@@ -21,9 +21,11 @@ package banco.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import banco.dao.CuentasDAO;
 import banco.dao.MovimientosDAO;
+import banco.model.Movimiento;
 
 public class BancoService {
     private final CuentasDAO cuentasDAO;
@@ -37,7 +39,7 @@ public class BancoService {
     }
 
     public int crearCuenta(String cliente, double saldoInicial, char tipoCuenta)
-        throws SQLException, IllegalArgumentException {
+            throws SQLException, IllegalArgumentException {
 
         if (saldoInicial < 0) {
             throw new IllegalArgumentException("El saldo inicial no puede ser negativo");
@@ -53,57 +55,71 @@ public class BancoService {
         return cuentasDAO.eliminarCuenta(numeroCuenta);
     }
 
-    public void depositar(int numeroCuenta, double monto) throws SQLException {
-        validarMontoPositivo(monto);
+    public boolean depositar(int numeroCuenta, double monto) throws SQLException {
+        validarMontoPositivo(monto); // Valida monto > 0
 
         try {
             connection.setAutoCommit(false);
 
             if (!cuentasDAO.existeCuenta(numeroCuenta)) {
-                throw new SQLException("La cuenta no existe");
+                throw new SQLException("La cuenta " + numeroCuenta + " no existe");
             }
 
             cuentasDAO.actualizarSaldo(numeroCuenta, monto, 'd');
             movimientosDAO.registrarMovimiento(numeroCuenta, 'd', monto);
 
             connection.commit();
+            return true;
         } catch (SQLException e) {
             connection.rollback();
-            throw e;
+            throw new SQLException("Error en depósito: " + e.getMessage(), e); // Mejor mensaje
         } finally {
             connection.setAutoCommit(true);
         }
     }
 
-    public void extraer(int numeroCuenta, double monto) throws SQLException {
+    public boolean extraer(int numeroCuenta, double monto) throws SQLException {
         validarMontoPositivo(monto);
 
         try {
             connection.setAutoCommit(false);
 
             if (!cuentasDAO.existeCuenta(numeroCuenta)) {
-                throw new SQLException("La cuenta no existe");
+                throw new SQLException("La cuenta " + numeroCuenta + " no existe");
             }
 
             double saldoActual = cuentasDAO.obtenerSaldo(numeroCuenta);
             if (saldoActual < monto) {
-                throw new SQLException("Saldo insuficiente");
+                throw new SQLException("Saldo insuficiente. Disponible: " + saldoActual);
             }
 
             cuentasDAO.actualizarSaldo(numeroCuenta, monto, 'e');
             movimientosDAO.registrarMovimiento(numeroCuenta, 'e', monto);
 
             connection.commit();
+            return true;
         } catch (SQLException e) {
             connection.rollback();
-            throw e;
+            throw new SQLException("Error en extracción: " + e.getMessage(), e);
         } finally {
             connection.setAutoCommit(true);
         }
     }
 
     public void consultarCuenta(int numeroCuenta) throws SQLException {
-        cuentasDAO.consultarDatosCuenta(numeroCuenta);
+        if (!cuentasDAO.existeCuenta(numeroCuenta)) {
+            throw new SQLException("La cuenta " + numeroCuenta + " no existe");
+        }
+        
+        double saldo = cuentasDAO.obtenerSaldo(numeroCuenta);
+        String cliente = cuentasDAO.obtenerCliente(numeroCuenta);
+        char tipoCuenta = cuentasDAO.obtenerTipoCuenta(numeroCuenta);
+        
+        System.out.println("\n--- DATOS DE LA CUENTA ---");
+        System.out.println("Número: " + numeroCuenta);
+        System.out.println("Cliente: " + cliente);
+        System.out.println("Tipo: " + (tipoCuenta == 'A' ? "Ahorro" : "Corriente"));
+        System.out.printf("Saldo actual: $%.2f\n", saldo);
     }
 
     private void validarMontoPositivo(double monto) throws SQLException {
@@ -111,4 +127,59 @@ public class BancoService {
             throw new SQLException("El monto debe ser positivo");
         }
     }
+
+    public void mostrarMovimientosCuenta(int numeroCuenta) throws SQLException {
+        List<Movimiento> movimientos = movimientosDAO.obtenerMovimientosCuenta(numeroCuenta);
+
+        System.out.println("\n=== MOVIMIENTOS CUENTA " + numeroCuenta + " ===");
+        System.out.println("ID     | CUENTA   | TIPO      | IMPORTE");
+        System.out.println("---------------------------------------");
+
+        if (movimientos.isEmpty()) {
+            System.out.println("No se encontraron movimientos");
+        } else {
+            movimientos.forEach(System.out::println);
+        }
+    }
+
+    public void mostrarMovimientosCliente(String nombreCliente) throws SQLException {
+        List<Movimiento> movimientos = movimientosDAO.obtenerMovimientosCliente(nombreCliente);
+        
+        System.out.println("\n=== MOVIMIENTOS DEL CLIENTE: " + nombreCliente.toUpperCase() + " ===");
+        System.out.println("ID     | CUENTA   | TIPO      | IMPORTE");
+        System.out.println("---------------------------------------");
+        
+        if (movimientos.isEmpty()) {
+            System.out.println("No se encontraron movimientos para este cliente");
+        } else {
+            movimientos.forEach(mov -> {
+                System.out.printf("%6d | %8d | %-9s | %10.2f\n",
+                    mov.getIdMovimiento(),
+                    mov.getNumeroCuenta(),
+                    mov.getTipo() == 'D' ? "DEPÓSITO" : "EXTRACCIÓN",
+                    mov.getMonto());
+            });
+        }
+    }
+
+    public void filtrarMovimientosPorTipo(int numeroCuenta, char tipo) throws SQLException {
+        if (tipo != 'D' && tipo != 'E') {
+            throw new IllegalArgumentException("Tipo debe ser D (Depósito) o E (Extracción)");
+        }
+        
+        List<Movimiento> movimientos = movimientosDAO.obtenerMovimientosPorTipo(numeroCuenta, tipo);
+        
+        System.out.println("\n=== " + (tipo == 'D' ? "DEPÓSITOS" : "EXTRACCIONES") + 
+                          " CUENTA " + numeroCuenta + " ===");
+        System.out.println("ID     | CUENTA   | IMPORTE");
+        System.out.println("---------------------------");
+        
+        movimientos.forEach(mov -> {
+            System.out.printf("%6d | %8d | %10.2f\n",
+                mov.getIdMovimiento(),
+                mov.getNumeroCuenta(),
+                mov.getMonto());
+        });
+    }
+
 }
