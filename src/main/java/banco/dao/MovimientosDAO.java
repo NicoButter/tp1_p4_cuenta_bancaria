@@ -77,8 +77,7 @@ public class MovimientosDAO {
                     rs.getInt("id_movimiento"),
                     rs.getInt("num_cuenta"), 
                     rs.getString("mov").charAt(0),
-                    rs.getDouble("importe"),
-                    null 
+                    rs.getDouble("importe")
                 ));
             }
         }
@@ -101,8 +100,7 @@ public class MovimientosDAO {
                     rs.getInt("id_movimiento"),
                     rs.getInt("cuenta"),
                     rs.getString("tipo").charAt(0), 
-                    rs.getDouble("monto"),
-                    rs.getTimestamp("fecha")
+                    rs.getDouble("monto")
                 ));
             }
         }
@@ -110,9 +108,11 @@ public class MovimientosDAO {
     }
 
     public List<Movimiento> obtenerMovimientosCliente(String nombreCliente) throws SQLException {
-        String sql = "SELECT m.*, c.cuenta as num_cuenta FROM movimientos m " +
+        String sql = "SELECT m.id_movimiento, c.cuenta as num_cuenta, m.mov as tipo, m.importe " +
+                    "FROM movimientos m " +
                     "JOIN cuentas c ON m.id_cuenta = c.id_cuenta " +
                     "WHERE c.cliente LIKE ? ORDER BY m.id_movimiento DESC";
+        
         List<Movimiento> movimientos = new ArrayList<>();
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -122,21 +122,20 @@ public class MovimientosDAO {
             while (rs.next()) {
                 movimientos.add(new Movimiento(
                     rs.getInt("id_movimiento"),
-                    rs.getInt("cuenta"),
-                    rs.getString("tipo").charAt(0), 
-                    rs.getDouble("monto"),
-                    rs.getTimestamp("fecha")
+                    rs.getInt("num_cuenta"),
+                    rs.getString("tipo").charAt(0),
+                    rs.getDouble("importe")
                 ));
             }
         }
         return movimientos;
     }
 
-    public void eliminarMovimientosPorCuenta(int idCuenta) throws SQLException {
+    public int eliminarMovimientosPorCuenta(int idCuenta) throws SQLException {
         String sql = "DELETE FROM movimientos WHERE id_cuenta = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, idCuenta);
-            stmt.executeUpdate();
+            return stmt.executeUpdate();
         }
     }
 }

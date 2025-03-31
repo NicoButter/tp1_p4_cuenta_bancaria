@@ -115,34 +115,6 @@ public class CuentasDAO {
         }
     }
 
-    public boolean eliminarCuenta(int numeroCuenta) throws SQLException {
-        String sqlVerificar = "SELECT saldo FROM cuentas WHERE cuenta = ?";
-        try (Connection conn = DatabaseConfig.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sqlVerificar)) {
-
-            stmt.setInt(1, numeroCuenta);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                double saldo = rs.getDouble("saldo");
-                if (saldo != 0) {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        }
-
-        String sqlEliminar = "DELETE FROM cuentas WHERE cuenta = ?";
-        try (Connection conn = DatabaseConfig.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sqlEliminar)) {
-
-            stmt.setInt(1, numeroCuenta);
-            int affectedRows = stmt.executeUpdate();
-            return affectedRows > 0;
-        }
-    }
-
     public boolean existeCuenta(int numeroCuenta) throws SQLException {
         String sql = "SELECT 1 FROM cuentas WHERE cuenta = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -195,12 +167,20 @@ public class CuentasDAO {
         }
     }
 
-    public int obtenerIdCuenta(int numeroCuenta) throws SQLException {
+    public int obtenerIdDeCuenta(int numeroCuenta) throws SQLException {
         String sql = "SELECT id_cuenta FROM cuentas WHERE cuenta = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, numeroCuenta);
             ResultSet rs = stmt.executeQuery();
-            return rs.next() ? rs.getInt("id_cuenta") : -1;
+            return rs.next() ? rs.getInt(1) : -1;
+        }
+    }
+
+    public int eliminarCuentaPorId(int idCuenta) throws SQLException {
+        String sql = "DELETE FROM cuentas WHERE id_cuenta = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, idCuenta);
+            return stmt.executeUpdate();
         }
     }
 }

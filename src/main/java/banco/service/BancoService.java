@@ -51,32 +51,29 @@ public class BancoService {
 
         return cuentasDAO.crearCuenta(cliente, saldoInicial, tipoCuenta);
     }
-    
+
     public boolean eliminarCuenta(int numeroCuenta) throws SQLException {
         try {
             connection.setAutoCommit(false);
-            
-            int idCuenta = cuentasDAO.obtenerIdCuenta(numeroCuenta);
-            if (idCuenta == -1) {
-                throw new SQLException("La cuenta " + numeroCuenta + " no existe");
-            }
-            
+
+            int idCuenta = cuentasDAO.obtenerIdDeCuenta(numeroCuenta);
+            if (idCuenta == -1)
+                throw new SQLException("Cuenta no existe");
+
             double saldo = cuentasDAO.obtenerSaldo(numeroCuenta);
-            if (saldo != 0) {
-                throw new SQLException("No se puede eliminar: la cuenta tiene saldo $" + saldo);
+            if (Math.abs(saldo) > 0.001) {
+                throw new SQLException("La cuenta tiene saldo: $" + String.format("%.2f", saldo));
             }
-            
-            movimientosDAO.eliminarMovimientosPorCuenta(idCuenta);
-            
-            boolean eliminada = cuentasDAO.eliminarCuenta(idCuenta);
-            
-            if (eliminada) {
-                connection.commit();
-                return true;
-            } else {
-                connection.rollback();
-                return false;
-            }
+
+            int movsEliminados = movimientosDAO.eliminarMovimientosPorCuenta(idCuenta);
+            System.out.println("Movimientos eliminados: " + movsEliminados);
+
+            int filasAfectadas = cuentasDAO.eliminarCuentaPorId(idCuenta);
+            if (filasAfectadas == 0)
+                throw new SQLException("No se pudo eliminar");
+
+            connection.commit();
+            return true;
         } catch (SQLException e) {
             connection.rollback();
             throw e;
@@ -86,7 +83,7 @@ public class BancoService {
     }
 
     public boolean depositar(int numeroCuenta, double monto) throws SQLException {
-        validarMontoPositivo(monto); 
+        validarMontoPositivo(monto);
 
         try {
             connection.setAutoCommit(false);
@@ -109,19 +106,19 @@ public class BancoService {
     }
 
     public void listarTodasLasCuentas() throws SQLException {
-    List<Cuenta> cuentas = cuentasDAO.listarTodasLasCuentas();
-    
-    System.out.println("\n=== LISTADO DE CUENTAS ===");
-    System.out.println("Número   | Cliente               | Tipo    | Saldo");
-    System.out.println("--------------------------------------------------");
-    
-    if (cuentas.isEmpty()) {
-        System.out.println("No hay cuentas registradas");
-    } else {
-        cuentas.forEach(System.out::println);
+        List<Cuenta> cuentas = cuentasDAO.listarTodasLasCuentas();
+
+        System.out.println("\n=== LISTADO DE CUENTAS ===");
+        System.out.println("Número   | Cliente               | Tipo    | Saldo");
+        System.out.println("--------------------------------------------------");
+
+        if (cuentas.isEmpty()) {
+            System.out.println("No hay cuentas registradas");
+        } else {
+            cuentas.forEach(System.out::println);
+        }
+        System.out.println("Total: " + cuentas.size() + " cuentas");
     }
-    System.out.println("Total: " + cuentas.size() + " cuentas");
-}
 
     public boolean extraer(int numeroCuenta, double monto) throws SQLException {
         validarMontoPositivo(monto);
@@ -155,11 +152,11 @@ public class BancoService {
         if (!cuentasDAO.existeCuenta(numeroCuenta)) {
             throw new SQLException("La cuenta " + numeroCuenta + " no existe");
         }
-        
+
         double saldo = cuentasDAO.obtenerSaldo(numeroCuenta);
         String cliente = cuentasDAO.obtenerCliente(numeroCuenta);
         char tipoCuenta = cuentasDAO.obtenerTipoCuenta(numeroCuenta);
-        
+
         System.out.println("\n--- DATOS DE LA CUENTA ---");
         System.out.println("Número: " + numeroCuenta);
         System.out.println("Cliente: " + cliente);
@@ -189,20 +186,20 @@ public class BancoService {
 
     public void mostrarMovimientosCliente(String nombreCliente) throws SQLException {
         List<Movimiento> movimientos = movimientosDAO.obtenerMovimientosCliente(nombreCliente);
-        
+
         System.out.println("\n=== MOVIMIENTOS DEL CLIENTE: " + nombreCliente.toUpperCase() + " ===");
         System.out.println("ID     | CUENTA   | TIPO      | IMPORTE");
         System.out.println("---------------------------------------");
-        
+
         if (movimientos.isEmpty()) {
             System.out.println("No se encontraron movimientos para este cliente");
         } else {
             movimientos.forEach(mov -> {
                 System.out.printf("%6d | %8d | %-9s | %10.2f\n",
-                    mov.getIdMovimiento(),
-                    mov.getNumeroCuenta(),
-                    mov.getTipo() == 'D' ? "DEPÓSITO" : "EXTRACCIÓN",
-                    mov.getMonto());
+                        mov.getIdMovimiento(),
+                        mov.getNumeroCuenta(),
+                        mov.getTipo() == 'D' ? "DEPÓSITO" : "EXTRACCIÓN",
+                        mov.getMonto());
             });
         }
     }
@@ -211,19 +208,19 @@ public class BancoService {
         if (tipo != 'D' && tipo != 'E') {
             throw new IllegalArgumentException("Tipo debe ser D (Depósito) o E (Extracción)");
         }
-        
+
         List<Movimiento> movimientos = movimientosDAO.obtenerMovimientosPorTipo(numeroCuenta, tipo);
-        
-        System.out.println("\n=== " + (tipo == 'D' ? "DEPÓSITOS" : "EXTRACCIONES") + 
-                          " CUENTA " + numeroCuenta + " ===");
+
+        System.out.println("\n=== " + (tipo == 'D' ? "DEPÓSITOS" : "EXTRACCIONES") +
+                " CUENTA " + numeroCuenta + " ===");
         System.out.println("ID     | CUENTA   | IMPORTE");
         System.out.println("---------------------------");
-        
+
         movimientos.forEach(mov -> {
             System.out.printf("%6d | %8d | %10.2f\n",
-                mov.getIdMovimiento(),
-                mov.getNumeroCuenta(),
-                mov.getMonto());
+                    mov.getIdMovimiento(),
+                    mov.getNumeroCuenta(),
+                    mov.getMonto());
         });
     }
 

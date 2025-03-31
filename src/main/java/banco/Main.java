@@ -128,7 +128,6 @@ public class Main {
     }
 
     private static void listarCuentas(BancoService bancoService) {
-        System.out.println("\n--- LISTADO DE CUENTAS ---");
         try {
             bancoService.listarTodasLasCuentas();
             pausar();
@@ -195,16 +194,14 @@ public class Main {
             
             if (bancoService.eliminarCuenta(cuenta)) {
                 System.out.println("Cuenta eliminada exitosamente");
-            } else {
-                System.out.println("No se pudo eliminar la cuenta");
-            } 
+            }
             pausar();
         } catch (InputMismatchException e) {
             System.err.println("Error: Ingrese un número válido");
             scanner.nextLine();
             pausar();
         } catch (SQLException e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println("Error al eliminar: " + e.getMessage());
             pausar();
         }
     }

@@ -1,3 +1,20 @@
+/**
+ * Sistema Bancario Básico - TP1 Ejercicio 4
+ * <p>
+ * Trabajo Práctico N°1 de la materia Laboratorio de Programación (2025) 
+ * de la Licenciatura en Sistemas de la Universidad Nacional de la Patagonia Austral (UNPA-UARG).
+ * </p>
+ * <p>
+ * Modelo que representa una cuenta bancaria con sus atributos esenciales.
+ * Se mapea directamente a la tabla 'cuentas' en la base de datos.
+ * </p>
+ * 
+ * @author Nicolas Butterfield
+ * @version 1.1
+ * @since Marzo 2025
+ */
+
+
 package banco.model;
 
 public class Cuenta {
