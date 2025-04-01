@@ -31,7 +31,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
 import banco.config.DatabaseConfig;
 
 public class CuentasDAO {
@@ -85,34 +84,62 @@ public class CuentasDAO {
         }
     }
 
+    /**
+     * Crea una nueva cuenta bancaria y devuelve su número de cuenta visible
+     * 
+     * @param cliente      Nombre del titular de la cuenta
+     * @param saldoInicial Saldo inicial de la cuenta
+     * @param tipoCuenta   Tipo de cuenta ('C'=Corriente, 'A'=Ahorro)
+     * @return Número de cuenta visible generado
+     * @throws SQLException Si ocurre un error al acceder a la base de datos
+     */
     public int crearCuenta(String cliente, double saldoInicial, char tipoCuenta) throws SQLException {
-        String sqlInsert = "INSERT INTO cuentas (cliente, saldo, tipo_cuenta) VALUES (?, ?, ?)";
-        String sqlUpdate = "UPDATE cuentas SET cuenta = ? WHERE id_cuenta = ?";
-
-        try (Connection conn = DatabaseConfig.getConnection();
-                PreparedStatement stmtInsert = conn.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS);
-                PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
-
-            stmtInsert.setString(1, cliente);
-            stmtInsert.setDouble(2, saldoInicial);
-            stmtInsert.setString(3, String.valueOf(tipoCuenta));
-            stmtInsert.executeUpdate();
-
-            int idGenerado;
-            try (ResultSet rs = stmtInsert.getGeneratedKeys()) {
-                if (!rs.next()) {
-                    throw new SQLException("Error al crear cuenta, no se obtuvo ID");
-                }
-                idGenerado = rs.getInt(1);
-            }
-
-            int numeroCuentaVisible = 1000 + idGenerado;
-            stmtUpdate.setInt(1, numeroCuentaVisible);
-            stmtUpdate.setInt(2, idGenerado);
-            stmtUpdate.executeUpdate();
-
-            return numeroCuentaVisible;
+        // Validaciones (se mantienen igual)
+        if (cliente == null || cliente.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del cliente no puede estar vacío");
         }
+        if (saldoInicial < 0) {
+            throw new IllegalArgumentException("El saldo inicial no puede ser negativo");
+        }
+        if (tipoCuenta != 'C' && tipoCuenta != 'A') {
+            throw new IllegalArgumentException("Tipo de cuenta inválido. Use 'C' para Corriente o 'A' para Ahorro");
+        }
+    
+        String sql = "INSERT INTO cuentas (cuenta, cliente, saldo, tipo_cuenta) VALUES (?, ?, ?, ?)";
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            // Primero obtenemos el próximo ID estimado
+            int nextId = obtenerProximoId();
+            int numeroCuenta = 1000 + nextId;
+            
+            stmt.setInt(1, numeroCuenta);
+            stmt.setString(2, cliente);
+            stmt.setDouble(3, saldoInicial);
+            stmt.setString(4, String.valueOf(tipoCuenta));
+            
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("La creación de cuenta falló");
+            }
+            
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    System.out.println("Cuenta creada exitosamente: " + numeroCuenta);
+                    return numeroCuenta;
+                }
+            }
+            throw new SQLException("No se pudo obtener la cuenta creada");
+        }
+    }
+    
+    private int obtenerProximoId() throws SQLException {
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SHOW TABLE STATUS LIKE 'cuentas'")) {
+            if (rs.next()) {
+                return rs.getInt("Auto_increment");
+            }
+        }
+        throw new SQLException("No se pudo obtener el próximo ID");
     }
 
     public boolean existeCuenta(int numeroCuenta) throws SQLException {

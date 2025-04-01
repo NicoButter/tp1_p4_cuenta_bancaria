@@ -85,28 +85,30 @@ public class MovimientosDAO {
     }
 
     public List<Movimiento> obtenerMovimientosPorTipo(int numeroCuenta, char tipo) throws SQLException {
-        String sql = "SELECT m.*, c.cuenta as num_cuenta FROM movimientos m " +
+        String sql = "SELECT m.id_movimiento, c.cuenta, m.mov, m.importe " +
+                    "FROM movimientos m " +
                     "JOIN cuentas c ON m.id_cuenta = c.id_cuenta " +
                     "WHERE c.cuenta = ? AND m.mov = ? ORDER BY m.id_movimiento DESC";
+        
         List<Movimiento> movimientos = new ArrayList<>();
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, numeroCuenta);
             stmt.setString(2, String.valueOf(tipo));
-            ResultSet rs = stmt.executeQuery();
-            
-            while (rs.next()) {
-                movimientos.add(new Movimiento(
-                    rs.getInt("id_movimiento"),
-                    rs.getInt("cuenta"),
-                    rs.getString("tipo").charAt(0), 
-                    rs.getDouble("monto")
-                ));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    movimientos.add(new Movimiento(
+                        rs.getInt("id_movimiento"),
+                        rs.getInt("cuenta"),
+                        rs.getString("mov").charAt(0),
+                        rs.getDouble("importe")
+                    ));
+                }
             }
         }
         return movimientos;
     }
-
+    
     public List<Movimiento> obtenerMovimientosCliente(String nombreCliente) throws SQLException {
         String sql = "SELECT m.id_movimiento, c.cuenta as num_cuenta, m.mov as tipo, m.importe " +
                     "FROM movimientos m " +
