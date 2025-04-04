@@ -261,15 +261,11 @@ public class Main {
         System.out.println("\n--- RESETEO DE BASE DE DATOS ---");
         System.out.println("ADVERTENCIA: Esto borrará todos los datos");
         System.out.print("¿Está seguro? (S/N): ");
-
+    
         String confirmacion = scanner.nextLine().toUpperCase();
         if (confirmacion.equals("S")) {
-            try {
-                new DatabaseInitializer(DatabaseConfig.getConnection()).resetCompleto();
-                System.out.println("Base de datos reseteada correctamente");
-            } catch (SQLException e) {
-                System.err.println(" Error al resetear: " + e.getMessage());
-            }
+            DatabaseInitializer initializer = new DatabaseInitializer(scanner);
+            initializer.ejecutarSubmenuRegeneracion();
         } else {
             System.out.println("Operación cancelada");
         }
