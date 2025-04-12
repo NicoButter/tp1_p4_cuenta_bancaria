@@ -51,7 +51,9 @@ El propósito de este trabajo práctico es aplicar y demostrar conocimientos sob
 
 - Este proyecto forma parte del **TP1 de Laboratorio de Programación 2025** (UNPA).  
 - Compatible con **MySQL** y **MariaDB** (ajusta el driver si usas otra base de datos).  
-- Asegúrate de tener el puerto **3306** abierto si usas una BD remota.  
+- Asegúrate de tener el puerto **3306** abierto si usas una BD remota.
+
+### Un banco para gobernarlos a todos, un balance para encontrarlos, un DAO para atraerlos a todos y atarlos en la transacción.  
 
 📌 **Autor:** Nicolás Butterfield  
 📧 **Contacto:** nicobutter@gmail.com
