@@ -54,6 +54,6 @@ El propósito de este trabajo práctico es aplicar y demostrar conocimientos sob
 - Asegúrate de tener el puerto **3306** abierto si usas una BD remota.  
 
 📌 **Autor:** Nicolás Butterfield  
-📧 **Contacto:** nicobutter@gmail.com (mailto:nicobutter@gmail.com)
+📧 **Contacto:** nicobutter@gmail.com
 
 🚀 ¡Gracias por revisar este proyecto! Si tienes dudas, pregúntame. 
