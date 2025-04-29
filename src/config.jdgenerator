@@ -1,0 +1,23 @@
+==== CONFIGS ====		
+{
+    "base_path": "/home/lordcommander/Documentos/unpa_2025/laboratorio_de_programacion/tp_1/tp1_p4_cuenta_bancaria/src",
+    "out": "/home/lordcommander/Documentos/unpa_2025/laboratorio_de_programacion/tp_1/tp1_p4_cuenta_bancaria/src/javadoc",
+    "javadoc_executable": "/usr/lib64/jvm/java-21-openjdk-21/bin/javadoc",
+    "exclude": [],
+    "raw_params": ""
+}
+
+==== COMMAND ====
+"/usr/lib64/jvm/java-21-openjdk-21/bin/javadoc" 
+	-sourcepath "/home/lordcommander/Documentos/unpa_2025/laboratorio_de_programacion/tp_1/tp1_p4_cuenta_bancaria/src" 
+	-d "/home/lordcommander/Documentos/unpa_2025/laboratorio_de_programacion/tp_1/tp1_p4_cuenta_bancaria/src/javadoc" 
+	"/home/lordcommander/Documentos/unpa_2025/laboratorio_de_programacion/tp_1/tp1_p4_cuenta_bancaria/src/main/java/banco/Main.java"
+	"/home/lordcommander/Documentos/unpa_2025/laboratorio_de_programacion/tp_1/tp1_p4_cuenta_bancaria/src/main/java/banco/config/DatabaseConfig.java"
+	"/home/lordcommander/Documentos/unpa_2025/laboratorio_de_programacion/tp_1/tp1_p4_cuenta_bancaria/src/main/java/banco/config/DatabaseInitializer.java"
+	"/home/lordcommander/Documentos/unpa_2025/laboratorio_de_programacion/tp_1/tp1_p4_cuenta_bancaria/src/main/java/banco/dao/CuentasDAO.java"
+	"/home/lordcommander/Documentos/unpa_2025/laboratorio_de_programacion/tp_1/tp1_p4_cuenta_bancaria/src/main/java/banco/dao/MovimientosDAO.java"
+	"/home/lordcommander/Documentos/unpa_2025/laboratorio_de_programacion/tp_1/tp1_p4_cuenta_bancaria/src/main/java/banco/model/Cuenta.java"
+	"/home/lordcommander/Documentos/unpa_2025/laboratorio_de_programacion/tp_1/tp1_p4_cuenta_bancaria/src/main/java/banco/model/Movimiento.java"
+	"/home/lordcommander/Documentos/unpa_2025/laboratorio_de_programacion/tp_1/tp1_p4_cuenta_bancaria/src/main/java/banco/service/BancoService.java"
+
+
